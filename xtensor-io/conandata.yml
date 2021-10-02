@@ -1,0 +1,7 @@
+sources:
+  "0.12.9":
+    url: https://github.com/xtensor-stack/xtensor-io/archive/refs/tags/0.12.9.tar.gz
+    sha256: baa35e69da5dd5713600db5a8fd9d6a26390be5a0067d64925e235d0cf54ac81
+  "0.12.7":
+    url: https://github.com/xtensor-stack/xtensor-io/archive/refs/tags/0.12.7.tar.gz
+    sha256: 69c2a2958562b645b6c639a2205364b08e548ea1b7319644d40e799a3c6e92e0
