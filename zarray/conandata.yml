@@ -1,4 +1,7 @@
 sources:
   "0.1.0":
     url: "https://github.com/xtensor-stack/zarray/archive/refs/tags/0.1.0.tar.gz"
-    sha256: "2aade20297da342d67bb6a18cf9f9c427f6eef9f4bc47adc0969a0438285f35a"
+    sha256: 2aade20297da342d67bb6a18cf9f9c427f6eef9f4bc47adc0969a0438285f35a
+  "0.0.6":
+    url: "https://github.com/xtensor-stack/zarray/archive/refs/tags/0.0.6.tar.gz"
+    sha256: b3441c0e5521ce69bb3b03097d9206686d7fb9f1505d2a6f7d7f4888e24875b7

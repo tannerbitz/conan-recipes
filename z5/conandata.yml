@@ -1,0 +1,4 @@
+sources:
+  "2.0.10":
+    url: "https://github.com/constantinpape/z5/archive/refs/tags/2.0.10.tar.gz"
+    sha256: 5bbe9f4a5f773099364b0ba22a0e10d839bff1371c0006c8a630bd0c01851aae

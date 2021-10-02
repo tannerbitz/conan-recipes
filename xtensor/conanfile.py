@@ -1,32 +1,43 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, tools
 from conans.errors import ConanInvalidConfiguration
 import os
 import textwrap
 
-class XtensorZarrConan(ConanFile):
-    name = "xtensor-zarr"
-    version = "0.0.7"
-    license = "BSD-3-Clause"
-    url = "http://xtensor-zarr.readthedocs.io/"
-    description = "xtensor-zarr offers an API to create and access a Zarr (v2 or v3) hierarchy in a store (locally or in the cloud), read and write arrays (in various formats) and groups in the hierarchy, and explore the hierarchy."
-    topics = ("xtensor-zarr", "zarr")
-    settings = "os", "compiler", "build_type", "arch"
-    options = {
-        "disable_arch_native": [True, False],
-        "shared": [True, False],
-    }
+required_conan_version = ">=1.33.0"
 
-    default_options = {
-        "disable_arch_native": False, 
-        "shared": False,
+
+class XtensorConan(ConanFile):
+    name = "xtensor"
+    license = "BSD-3-Clause"
+    url = "https://github.com/conan-io/conan-center-index"
+    homepage = "https://github.com/xtensor-stack/xtensor"
+    description = "C++ tensors with broadcasting and lazy computing"
+    topics = ("conan", "numpy", "multidimensional-arrays", "tensors")
+    settings = "os", "arch", "compiler", "build_type"
+    version = "0.23.7"
+    options = {
+        "xsimd": [True, False],
+        "tbb": [True, False],
+        "openmp": [True, False],
     }
+    default_options = {
+        "xsimd": True,
+        "tbb": False,
+        "openmp": False,
+    }
+    no_copy_source = True
 
     @property
     def _source_subfolder(self):
         return "source_subfolder"
 
     def configure(self):
-        # https://xtensor-zarr.readthedocs.io/en/latest/
+        if self.options.tbb and self.options.openmp:
+            raise ConanInvalidConfiguration(
+                "The options 'tbb' and 'openmp' can not be used together."
+            )
+
+        # https://github.com/xtensor-stack/xtensor/blob/master/README.md
         # - On Windows platforms, Visual C++ 2015 Update 2, or more recent
         # - On Unix platforms, gcc 4.9 or a recent version of Clang
         version = tools.Version(self.settings.compiler.version)
@@ -41,20 +52,19 @@ class XtensorZarrConan(ConanFile):
             raise ConanInvalidConfiguration("xtensor requires at least C++14")
 
     def requirements(self):
-        self.requires("xtensor/0.23.7")
-        self.requires("xtensor-io/0.12.7")
-        self.requires("zarray/0.1.0")
+        self.requires("xtl/0.7.2")
         self.requires("nlohmann_json/3.9.1")
-        self.requires("c-blosc/1.21.0")
-        self.requires("zlib/1.2.11")
-        self.requires("gdal/3.3.1")
-        self.requires("ghc-filesystem/1.5.8")
-        self.requires("zstd/1.5.0")
+        if self.options.xsimd:
+            self.requires("xsimd/7.4.10")
+        if self.options.tbb:
+            self.requires("tbb/2020.3")
 
+    def package_id(self):
+        self.info.header_only()
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version],
-        destination=self._source_subfolder, strip_root=True)
+                  destination=self._source_subfolder, strip_root=True)
 
     def package(self):
         self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
@@ -63,7 +73,7 @@ class XtensorZarrConan(ConanFile):
         )
         self._create_cmake_module_alias_targets(
             os.path.join(self.package_folder, self._module_file_rel_path),
-            {"xtensor-zarr": "xtensor-zarr::xtensor-zarr"}
+            {"xtensor": "xtensor::xtensor"}
         )
 
     @staticmethod
@@ -88,15 +98,15 @@ class XtensorZarrConan(ConanFile):
                             "conan-official-{}-targets.cmake".format(self.name))
 
     def package_info(self):
-        self.cpp_info.names["cmake_find_package"] = "xtensor-zarr"
-        self.cpp_info.names["cmake_find_package_multi"] = "xtensor-zarr"
+        self.cpp_info.names["cmake_find_package"] = "xtensor"
+        self.cpp_info.names["cmake_find_package_multi"] = "xtensor"
         self.cpp_info.builddirs.append(self._module_subfolder)
         self.cpp_info.build_modules["cmake_find_package"] = [self._module_file_rel_path]
         self.cpp_info.build_modules["cmake_find_package_multi"] = [self._module_file_rel_path]
-        self.cpp_info.names["pkg_config"] = "xtensor-zarr"
-        if self.options.disable_arch_native:
-            self.cpp_info.defines.append("XTENSOR_ZARR_DISABLE_ARCH_NATIVE")
-        if self.options.shared:
-            self.cpp_info.defines.append("XTENSOR_ZARR_BUILD_SHARED_LIBS")
-        else:
-            self.cpp_info.defines.append("XTENSOR_ZARR_BUILD_STATIC_LIBS")
+        self.cpp_info.names["pkg_config"] = "xtensor"
+        if self.options.xsimd:
+            self.cpp_info.defines.append("XTENSOR_USE_XSIMD")
+        if self.options.tbb:
+            self.cpp_info.defines.append("XTENSOR_USE_TBB")
+        if self.options.openmp:
+            self.cpp_info.defines.append("XTENSOR_USE_OPENMP")

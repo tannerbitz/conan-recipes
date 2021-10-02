@@ -14,7 +14,7 @@ class XtensorIoConan(ConanFile):
     description = "xtensor-io offers an API to read and write various file formats into xtensor data structures"
     topics = ("conan", "xtesnor-io", "binary storage")
     settings = "os", "arch", "compiler", "build_type"
-    version = "0.12.9"
+    version = "0.12.7"
     options = {
         "oiio": [True, False],
         "sndfile": [True, False],
