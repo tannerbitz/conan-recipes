@@ -21,6 +21,9 @@ class Z5Conan(ConanFile):
         "bzip2": [True, False],
         "xz": [True, False],
         "lz4": [True, False],
+        "s3": [True, False],
+        "gcs": [True, False],
+        "build_py": [True, False],
     }
     default_options = {
         "blosc": False,
@@ -28,6 +31,9 @@ class Z5Conan(ConanFile):
         "bzip2": False,
         "xz": False,
         "lz4": False,
+        "s3": False,
+        "gcs": False,
+        "build_py": False,
     }
     
     no_copy_source = True
@@ -50,6 +56,15 @@ class Z5Conan(ConanFile):
             self.requires("xz_utils/5.2.5")
         if self.options.lz4:
             self.requires("lz4/1.9.3")
+        if self.options.s3:
+            self.requires("aws-c-s3/0.1.19")
+        if self.options.gcs:
+            self.requires("google-cloud-cpp/1.30.1")
+        if self.options.build_py:
+            self.requires("pybind11/2.7.1")
+            self.requires("xtensor-python/0.25.3")
+
+
 
     def package_id(self):
         self.info.header_only()
@@ -106,4 +121,10 @@ class Z5Conan(ConanFile):
             self.cpp_info.defines.append("WITH_XZ")
         if self.options.lz4:
             self.cpp_info.defines.append("WITH_LZ4")
+        if self.options.s3:
+            self.cpp_info.defines.append("WITH_S3")
+        if self.options.gcs:
+            self.cpp_info.defines.append("WITH_GCS")
+        if self.options.build_py:
+            self.cpp_info.defines.append("BUILD_Z5PY")
 
